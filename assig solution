@@ -1,0 +1,108 @@
+#include <iostream>
+#include<queue>
+#include<list>
+
+using namespace std;
+
+typedef pair<int, int> pd;        //min heap class compare to make the min heap take pair numbers and sort them according to the 2nd element
+class Compare
+{
+public:
+    bool operator()(pair<int, int> a, pair<int, int> b)
+    {
+        return a.second > b.second;
+    }
+};
+
+void print(list<pair<int, int> >&Pairs)    //overriding the print operator for the list to print the numbers as pairs
+{
+
+    cout << "Reservations : " << '\n';
+    for (auto CPair : Pairs)
+    {
+        // Each element of the list is
+        // a pair itself
+        pair<int, int> currentPair = CPair;
+
+        cout << "{";
+
+        // Printing pair contents
+        cout << CPair.first << ","  <<
+            CPair.second;
+        cout << "}";
+        cout << '\n';
+    }
+}
+
+bool overlapping(int a , int b ,list<pair<int,int>> s) {     // a function to ensure that there is no overlapping
+
+                                             // takes 3 argumenst arrival date (a) departure date(b) and the list that has the prev reservations(s)
+
+    pair<int, int>* Ptr = &s.back();
+
+    if (b <= Ptr->first || a >= Ptr->second) // condition of no overlapping reservations
+    {
+        Ptr = ++Ptr;
+        return true;
+    }
+    else
+    {
+        
+        return false;
+    }
+
+
+}
+
+
+
+
+int main()
+{
+    // min heap is defined using the custom comparator
+    priority_queue <pair<int, int>, vector<pair<int, int>>, Compare> minHeap;
+    int n;
+
+    // Taking user inputs
+    cout << "Enter no. of reservations: ";
+    cin >> n;
+    
+        list < pair<int, int>> s;       //declaring the list the will have the organized reservations
+
+        for (int i = 0; i < n; i++)
+        {
+            cout << "Enter arrival date and departure date of pair " << (i + 1) << " separated by space: ";
+            int a, b;
+            cin >> a >> b;
+            if (a >= b && b>31) {  //making sure that arrival date is not greater than departure date and it doesnt exceed 31
+                cout << "error arrival date cant be greater than departure date\n";
+                break;
+            }
+                
+            else {
+                minHeap.push({ a,b });  //inserting the user input into the min heap to sort it by ascending order according to leaving date
+
+                pair<int, int> top = minHeap.top();
+                pair<int, int> res;
+                res = make_pair(top.first, top.second);     // creating the pair reservation that will take the top arrival and departure dates 
+                                                             // to be inserted into the list after being checked for overlapping
+
+                if (s.empty())
+                    s.push_back(res);     //if the list is empty directly insert the reservation 
+                else
+
+                    if (overlapping(top.first, top.second, s))  //if the list is not empty check each reservation if it overlaps with other
+                    {                                           // reservations if not insert it other wise dont
+                        s.push_back(res);
+                    }
+
+                minHeap.pop();    // poping the min heap to move to the next element according to increasing order of leaving dates 
+
+
+            }
+            s.sort();  // sorting the list to make sure all the reservs are ordered by increasingly
+            print(s);
+        } //printing the organized non overlaping reserves for the guest-house
+    
+
+}
